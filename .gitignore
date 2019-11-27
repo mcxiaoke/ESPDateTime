@@ -1,0 +1,20 @@
+*.pdsbak
+*.workspace
+*.tmp
+*.obj
+*.hex
+*.elf
+*.bin
+*.out
+build
+.DS_Store
+Objects
+Backup Of *
+config.h
+__pycache__
+*.pyc
+.vscode
+config.py
+config.ini
+config.json
+.history
