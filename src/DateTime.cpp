@@ -44,7 +44,7 @@ bool DateTimeClass::setTimeZone(int _timeZone) {
   if (timeZone >= -11 || timeZone <= 13) {
     timeZone = timeZone;
     // config changed, update
-    forceUpdate(DEFAULT_TIMEOUT);
+    forceUpdate(DEFAULT_TIMEOUT / 2);
     return true;
   }
   return false;
@@ -55,11 +55,12 @@ void DateTimeClass::setServer(const char* _server) {
   }
   ntpServer = _server;
   // config changed, update
-  forceUpdate(DEFAULT_TIMEOUT);
+  forceUpdate(DEFAULT_TIMEOUT / 2);
 }
 
 bool DateTimeClass::forceUpdate(const unsigned int timeOutMs) {
-  Serial.printf("forceUpdate: %d - %s\n", timeZone, ntpServer);
+  _DTLOGF("forceUpdate,begin,timeZone:%d, server:%s, timeOut:%lu\n", timeZone,
+          ntpServer, timeOutMs);
   // esp8266 not support time_zone, just add seconds
   // so strftime %z always +0000
   configTime(timeZone * 3600, 0, ntpServer, NTP_SERVER_2, NTP_SERVER_3);
@@ -71,7 +72,6 @@ bool DateTimeClass::forceUpdate(const unsigned int timeOutMs) {
     now = time(nullptr);
   }
   setTime(time(nullptr));
-  Serial.println(timeIsSet());
   return timeIsSet();
 }
 
@@ -79,6 +79,7 @@ bool DateTimeClass::setTime(const time_t timeSecs, bool forceSet) {
   if (forceSet || timeSecs > SECS_START_POINT) {
     bootTimeSecs = timeSecs - millis() / 1000;
   }
+  _DTLOGF("setTime,timeSecs:%ld, bootTimeSecs:%ld\n", timeSecs, bootTimeSecs);
   return timeIsSet();
 }
 

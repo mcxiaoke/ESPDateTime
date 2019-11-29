@@ -1,6 +1,11 @@
-#ifndef EXT_ESP_DATE_TIME_H
-#define EXT_ESP_DATE_TIME_H
+#ifndef ESP_DATE_TIME_CLASS_H
+#define ESP_DATE_TIME_CLASS_H
 
+#if !defined(ESP8266) && !defined(ESP32)
+#error "ESPDateTime only support ESP32 or ESP8266 platform!"
+#endif
+
+#include "debug.h"
 #include <Arduino.h>
 #include <time.h>
 #include <sys/time.h>
@@ -11,78 +16,6 @@ constexpr static unsigned long DIFF1900TO1970 = 2208988800UL;
 constexpr static time_t SECS_START_POINT = 1574870400;  // 20191128
 
 class DateTimeClass;
-
-class TimeElapsed {
- private:
-  unsigned long ms;
-
- public:
-  TimeElapsed() : ms(millis()) {}
-  TimeElapsed(unsigned long val) { ms = millis() - val; }
-  TimeElapsed(const TimeElapsed& rhs) { ms = rhs.ms; }
-  operator unsigned long() const { return millis() - ms; }
-  TimeElapsed& operator=(const TimeElapsed& rhs) {
-    ms = rhs.ms;
-    return *this;
-  }
-  TimeElapsed& operator=(unsigned long val) {
-    ms = millis() - val;
-    return *this;
-  }
-  TimeElapsed& operator-=(unsigned long val) {
-    ms += val;
-    return *this;
-  }
-  TimeElapsed& operator+=(unsigned long val) {
-    ms -= val;
-    return *this;
-  }
-  TimeElapsed operator-(int val) const {
-    TimeElapsed r(*this);
-    r.ms += val;
-    return r;
-  }
-  TimeElapsed operator-(unsigned int val) const {
-    TimeElapsed r(*this);
-    r.ms += val;
-    return r;
-  }
-  TimeElapsed operator-(long val) const {
-    TimeElapsed r(*this);
-    r.ms += val;
-    return r;
-  }
-  TimeElapsed operator-(unsigned long val) const {
-    TimeElapsed r(*this);
-    r.ms += val;
-    return r;
-  }
-  TimeElapsed operator+(int val) const {
-    TimeElapsed r(*this);
-    r.ms -= val;
-    return r;
-  }
-  TimeElapsed operator+(unsigned int val) const {
-    TimeElapsed r(*this);
-    r.ms -= val;
-    return r;
-  }
-  TimeElapsed operator+(long val) const {
-    TimeElapsed r(*this);
-    r.ms -= val;
-    return r;
-  }
-  TimeElapsed operator+(unsigned long val) const {
-    TimeElapsed r(*this);
-    r.ms -= val;
-    return r;
-  }
-};
-
-struct DateTimeInfo {
-  time_t seconds;       // seconds
-  time_t microseconds;  // microseconds
-};
 
 struct DateTimeFormat {
   constexpr static const char* ISO8601 = "%FT%T%z";                 // ISO 8601
@@ -122,9 +55,9 @@ class DateTimeClass {
   constexpr static int TIMEZONE_UTC = 0;
   constexpr static int TIMEZONE_CHINA = 8;
   constexpr static int DEFAULT_TIMEZONE = TIMEZONE_CHINA;  // time zone offset
-  constexpr static unsigned int DEFAULT_TIMEOUT = 15 * 1000;  // milliseconds
+  constexpr static unsigned int DEFAULT_TIMEOUT = 10 * 1000;  // milliseconds
   constexpr static const char* NTP_SERVER_1 = "ntp.ntsc.ac.cn";
-  constexpr static const char* NTP_SERVER_2 = "cn.ntp.org.cn";
+  constexpr static const char* NTP_SERVER_2 = "pool.ntp.org";
   constexpr static const char* NTP_SERVER_3 = "time.windows.com";
   DateTimeClass(const time_t _timeSecs = 0,
                 const int _timeZone = DEFAULT_TIMEZONE,
