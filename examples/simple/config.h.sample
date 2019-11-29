@@ -1,0 +1,5 @@
+
+#ifndef WIFI_SSID
+#define WIFI_SSID "xxxx"
+#define WIFI_PASS "xxxx"
+#endif

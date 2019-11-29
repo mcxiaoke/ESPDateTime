@@ -8,7 +8,8 @@
 // }
 
 static time_t validateTime(const time_t timeSecs) {
-  return timeSecs > SECS_START_POINT ? (timeSecs - millis() / 1000) : 0;
+  auto bootSecs = timeSecs - (time_t)(millis() / 1000);
+  return bootSecs > SECS_START_POINT ? bootSecs : DateTimeClass::TIME_ZERO;
 }
 
 String DateTimeParts::format(const char* fmt) const {
@@ -18,7 +19,7 @@ String DateTimeParts::format(const char* fmt) const {
 }
 
 String DateTimeParts::toString() const {
-  return format(DateTimeFormat::ISO8601);
+  return format(DateFormatter::ISO8601);
 }
 
 DateTimeParts DateTimeParts::from(const time_t timeSecs, const int timeZone) {
@@ -35,16 +36,16 @@ DateTimeClass::DateTimeClass(const time_t _timeSecs,
                              const char* _ntpServer)
     : bootTimeSecs(validateTime(_timeSecs)),
       timeZone(_timeZone),
-      ntpServer(_ntpServer) {}
+      ntpServer(_ntpServer),
+      ntpMode(bootTimeSecs == TIME_ZERO) {}
 
 bool DateTimeClass::setTimeZone(int _timeZone) {
   if (_timeZone == timeZone) {
     return false;
   }
+  _DTLOGF("setTimeZone to %d\n", _timeZone);
   if (timeZone >= -11 || timeZone <= 13) {
-    timeZone = timeZone;
-    // config changed, update
-    forceUpdate(DEFAULT_TIMEOUT / 2);
+    timeZone = _timeZone;
     return true;
   }
   return false;
@@ -53,13 +54,12 @@ void DateTimeClass::setServer(const char* _server) {
   if (strcmp(_server, ntpServer) == 0) {
     return;
   }
+  _DTLOGF("setServer to %s\n", _server);
   ntpServer = _server;
-  // config changed, update
-  forceUpdate(DEFAULT_TIMEOUT / 2);
 }
 
 bool DateTimeClass::forceUpdate(const unsigned int timeOutMs) {
-  _DTLOGF("forceUpdate,begin,timeZone:%d, server:%s, timeOut:%lu\n", timeZone,
+  _DTLOGF("forceUpdate,timeZone:%d, server:%s, timeOut:%u\n", timeZone,
           ntpServer, timeOutMs);
   // esp8266 not support time_zone, just add seconds
   // so strftime %z always +0000
@@ -71,16 +71,18 @@ bool DateTimeClass::forceUpdate(const unsigned int timeOutMs) {
     delay(50 + 50 * retryCount++);
     now = time(nullptr);
   }
+  _DTLOGF("forceUpdate,now:%ld\n", now);
+  ntpMode = true;
   setTime(time(nullptr));
-  return timeIsSet();
+  return isTimeValid();
 }
 
 bool DateTimeClass::setTime(const time_t timeSecs, bool forceSet) {
   if (forceSet || timeSecs > SECS_START_POINT) {
-    bootTimeSecs = timeSecs - millis() / 1000;
+    bootTimeSecs = timeSecs - (time_t)(millis() / 1000);
   }
   _DTLOGF("setTime,timeSecs:%ld, bootTimeSecs:%ld\n", timeSecs, bootTimeSecs);
-  return timeIsSet();
+  return isTimeValid();
 }
 
 String DateTimeClass::format(const char* fmt) {

@@ -10,21 +10,12 @@
 #include <time.h>
 #include <sys/time.h>
 
+class DateTimeClass;
+
 constexpr static unsigned long DIFF1900TO1970 = 2208988800UL;
 // 2019/01/01 00:00:00 in TimeZone+8
 // time() < this means invalid
 constexpr static time_t SECS_START_POINT = 1574870400;  // 20191128
-
-class DateTimeClass;
-
-struct DateTimeFormat {
-  constexpr static const char* ISO8601 = "%FT%T%z";                 // ISO 8601
-  constexpr static const char* HTTP = "%a, %d %b %Y %H:%M:%S GMT";  // RFC 1123
-  constexpr static const char* SIMPLE = "%F %T";
-  constexpr static const char* COMPAT = "%Y%m%d_%H%M%S";
-  constexpr static const char* DATE_ONLY = "%F";
-  constexpr static const char* TIME_ONLY = "%T";
-};
 
 struct DateTimeParts {
   // http://www.cplusplus.com/reference/ctime/tm/
@@ -50,16 +41,31 @@ struct DateTimeParts {
   static DateTimeParts from(DateTimeClass* dateTime);
 };
 
+struct DateFormatter {
+  constexpr static const char* ISO8601 = "%FT%T%z";                 // ISO 8601
+  constexpr static const char* HTTP = "%a, %d %b %Y %H:%M:%S GMT";  // RFC 1123
+  constexpr static const char* SIMPLE = "%F %T";
+  constexpr static const char* COMPAT = "%Y%m%d_%H%M%S";
+  constexpr static const char* DATE_ONLY = "%F";
+  constexpr static const char* TIME_ONLY = "%T";
+  String format(const char* fmt,
+                const time_t timeSecs,
+                const int timeZone = 0) const {
+    return DateTimeParts::from(timeSecs, timeZone).format(fmt);
+  }
+};
+
 class DateTimeClass {
  public:
+  constexpr static time_t TIME_ZERO = 0;
   constexpr static int TIMEZONE_UTC = 0;
   constexpr static int TIMEZONE_CHINA = 8;
-  constexpr static int DEFAULT_TIMEZONE = TIMEZONE_CHINA;  // time zone offset
+  constexpr static int DEFAULT_TIMEZONE = TIMEZONE_UTC;  // time zone offset
   constexpr static unsigned int DEFAULT_TIMEOUT = 10 * 1000;  // milliseconds
   constexpr static const char* NTP_SERVER_1 = "ntp.ntsc.ac.cn";
   constexpr static const char* NTP_SERVER_2 = "pool.ntp.org";
   constexpr static const char* NTP_SERVER_3 = "time.windows.com";
-  DateTimeClass(const time_t _timeSecs = 0,
+  DateTimeClass(const time_t _timeSecs = TIME_ZERO,
                 const int _timeZone = DEFAULT_TIMEZONE,
                 const char* _ntpServer = NTP_SERVER_1);
   bool setTimeZone(int _timeZone);
@@ -71,20 +77,34 @@ class DateTimeClass {
   // inline functions
   //   void formatTo(const char* fmt, char* dst);
   inline bool begin(const unsigned int timeOutMs = DEFAULT_TIMEOUT) {
-    return timeIsSet() || forceUpdate(timeOutMs);
+    return isTimeValid() || forceUpdate(timeOutMs);
   }
-  inline bool timeIsSet() { return bootTimeSecs > SECS_START_POINT; }
-  inline time_t getBootTime() const { return bootTimeSecs; }
+  inline bool isTimeValid() const { return bootTimeSecs > SECS_START_POINT; }
+  inline time_t getBootTime() const {
+    return bootTimeSecs > SECS_START_POINT
+               ? bootTimeSecs
+               : TIME_ZERO - (time_t)(millis() / 1000);
+  }
   inline time_t now() const { return getTime(); }
-  inline time_t getTime() const { return bootTimeSecs + millis() / 1000; }
-  inline time_t osTime() const { return time(nullptr); }
-  inline time_t utcTime() const { return osTime() - timeZone * 3600; }
+  inline time_t getTime() const {
+    return bootTimeSecs > SECS_START_POINT
+               ? (bootTimeSecs + (time_t)(millis() / 1000))
+               : TIME_ZERO;
+  }
+  inline time_t utcTime() const {
+    return bootTimeSecs > SECS_START_POINT ? (getTime() - timeZone * 3600)
+                                           : TIME_ZERO;
+  }
+  inline time_t osTime() const {
+    auto t = time(nullptr);
+    return t > SECS_START_POINT ? t : TIME_ZERO;
+  }
   inline int getTimeZone() const { return timeZone; }
+  inline const char* getServer() { return ntpServer; }
   inline DateTimeParts getParts() { return DateTimeParts::from(this); }
-  inline String toString() { return format(DateTimeFormat::SIMPLE); }
-  inline String toISOString() { return format(DateTimeFormat::ISO8601); }
-  inline String toUTCString() { return formatUTC(DateTimeFormat::HTTP); }
-
+  inline String toString() { return format(DateFormatter::SIMPLE); }
+  inline String toISOString() { return format(DateFormatter::ISO8601); }
+  inline String toUTCString() { return formatUTC(DateFormatter::HTTP); }
   // operator overloads
   DateTimeClass operator+(const time_t timeDeltaSecs) {
     DateTimeClass dt(getTime() + timeDeltaSecs, timeZone, ntpServer);
@@ -127,6 +147,7 @@ class DateTimeClass {
   unsigned long bootTimeSecs;
   int timeZone;
   const char* ntpServer;
+  bool ntpMode;
 };
 
 extern DateTimeClass DateTime;  // define in cpp
