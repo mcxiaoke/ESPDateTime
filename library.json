@@ -1,10 +1,12 @@
 {
   "name": "ESPDateTime",
+  "keywords": "esp8266,esp32,arduino,utils,datetime,date,time,formatter,ntp",
   "description": "Date Time Functions and Classes for ESP8266 and ESP32",
-  "keywords": "esp8266,esp32,arduino,utils,datetime,date,time",
+  "homepage": "https://github.com/mcxiaoke/ESPDateTime",
   "authors": {
     "name": "Zhang Xiaoke",
     "email": "github@mcxiaoke.com",
+    "url": "https://github.com/mcxiaoke",
     "maintainer": true
   },
   "repository": {

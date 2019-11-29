@@ -48,9 +48,9 @@ struct DateFormatter {
   constexpr static const char* COMPAT = "%Y%m%d_%H%M%S";
   constexpr static const char* DATE_ONLY = "%F";
   constexpr static const char* TIME_ONLY = "%T";
-  String format(const char* fmt,
-                const time_t timeSecs,
-                const int timeZone = 0) const {
+  inline static String format(const char* fmt,
+                              const time_t timeSecs,
+                              const int timeZone = 0) {
     return DateTimeParts::from(timeSecs, timeZone).format(fmt);
   }
 };

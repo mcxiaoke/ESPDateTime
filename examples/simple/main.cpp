@@ -28,38 +28,61 @@ void setupWiFi() {
   Serial.println();
 }
 
+void setupDateTime() {
+  // setup this after wifi connected
+  // you can use custom timeZone,server and timeout
+  // DateTime.setTimeZone(-4);
+  //   DateTime.setServer("asia.pool.ntp.org");
+  //   DateTime.begin(15 * 1000);
+  DateTime.setTimeZone(8);
+  DateTime.begin();
+  if (!DateTime.isTimeValid()) {
+    Serial.println("Failed to get time from server.");
+  }
+}
+
 void setup() {
   delay(1000);
   Serial.begin(115200);
   setupWiFi();
+  setupDateTime();
+  Serial.println(DateTime.now());
+  Serial.println(DateTime.getTime());
+  Serial.println(DateTime.utcTime());
+  Serial.println("--------------------");
   Serial.println(DateTime.toString());
   Serial.println(DateTime.toISOString());
   Serial.println(DateTime.toUTCString());
-  Serial.println(millis());
-  Serial.println("Time Syncing");
-  DateTime.setTimeZone(DateTimeClass::TIMEZONE_CHINA);
-  DateTime.begin();
-  time_t now = DateTime.now();
-  Serial.println(ctime(&now));
-  DateTimeClass dt;
+  Serial.println("--------------------");
+  Serial.println(DateTime.format(DateFormatter::COMPAT));
+  Serial.println(DateTime.format(DateFormatter::DATE_ONLY));
+  Serial.println(DateTime.format(DateFormatter::TIME_ONLY));
+  Serial.println("--------------------");
+  DateTimeParts p = DateTime.getParts();
+  Serial.printf("%04d/%02d/%02d %02d:%02d:%02d %ld %+05d\n", p.getYear(),
+                p.getMonth(), p.getMonthDay(), p.getHours(), p.getMinutes(),
+                p.getSeconds(), p.getTime(), p.getTimeZone());
+  Serial.println("--------------------");
+  time_t t = DateTime.now();
+  Serial.println(DateFormatter::format("%Y/%m/%d %H:%M:%S", t));
+  Serial.println(DateFormatter::format("%x - %I:%M %p", t));
+  Serial.println(DateFormatter::format("Now it's %F %I:%M%p.", t));
 }
 
 void loop() {
-  if (millis() - ms > 10000) {
+  if (millis() - ms > 5000) {
     ms = millis();
-    Serial.println(DateTime.format(DateFormatter::COMPAT));
-    Serial.println(DateTime.toString());
-    Serial.println(DateTime.toISOString());
-    Serial.println(DateTime.toUTCString());
-    // DateTimeClass a(1574953106, 8);
-    // DateTimeClass b(1574955106, 8);
-    // auto c = a - 3600 * 10;
-    // auto d = b + 3600 * 24;
-    // Serial.println(a.toString());
-    // Serial.println(b.toString());
-    // Serial.println(c.toString());
-    // Serial.println(d.toString());
-    // Serial.println(a < b);
-    Serial.println("----------");
+    Serial.println("--------------------");
+    if (!DateTime.isTimeValid()) {
+      Serial.println("Failed to get time from server, retry.");
+      DateTime.begin();
+    } else {
+      Serial.printf("Up     Time:   %lu seconds\n", millis() / 1000);
+      Serial.printf("Local  Time:   %ld\n", DateTime.now());
+      Serial.printf("Local  Time:   %s\n", DateTime.toString().c_str());
+      Serial.printf("UTC    Time:   %ld\n", DateTime.utcTime());
+      Serial.printf("UTC    Time:   %s\n",
+                    DateTime.formatUTC(DateFormatter::SIMPLE).c_str());
+    }
   }
 }
