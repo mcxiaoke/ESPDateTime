@@ -1,9 +1,5 @@
 
 #include <Arduino.h>
-#include <ctime>
-#include <iomanip>
-#include <cstdio>
-#include <cstdlib>
 #if defined(ESP8266)
 #include <ESP8266WiFi.h>
 #elif defined(ESP32)
@@ -11,6 +7,13 @@
 #endif
 #include "config.h"
 #include "ESPDateTime.h"
+
+// don't forget to change this to real ssid/password
+// or set these in config.h and include it
+#ifndef WIFI_SSID
+#define WIFI_SSID "Change to your WiFi SSID"
+#define WIFI_PASS "Change to your WiFi Password"
+#endif
 
 unsigned long lastMs = 0;
 
@@ -40,6 +43,12 @@ void setupDateTime() {
     Serial.println("Failed to get time from server.");
   }
 }
+
+/**
+ * More examples and docs see :
+ * https://github.com/mcxiaoke/ESPDateTime
+ *
+ */
 
 void setup() {
   delay(1000);
