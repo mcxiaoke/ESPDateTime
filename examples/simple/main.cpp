@@ -5,7 +5,7 @@
 #elif defined(ESP32)
 #include <WiFi.h>
 #endif
-#include "config.h"
+// #include "config.h"
 #include "ESPDateTime.h"
 
 // don't forget to change this to real ssid/password

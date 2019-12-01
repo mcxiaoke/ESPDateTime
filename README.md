@@ -2,6 +2,8 @@
 
 This library provides a simple class `DateTimeClass` for sync system timestamp vis ntp and a struct `DateFormatter` to format date time to string, works on **ESP8266** and **ESP32** platform.
 
+Current Version: **v0.2.0**
+
 # Install
 
 ## Using PlatformIO
@@ -104,7 +106,7 @@ See [examples](https://github.com/mcxiaoke/ESPDateTime/tree/master/examples/) fo
 
 ## Documents
 
-// todo
+See [API Reference](https://blog.mcxiaoke.com/ESPDateTime/).
 
 # License
 
