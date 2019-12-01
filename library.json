@@ -1,6 +1,6 @@
 {
   "name": "ESPDateTime",
-  "keywords": "esp8266,esp32,arduino,utils,datetime,date,time,formatter,ntp",
+  "keywords": "esp8266,esp32,arduino,utils,datetime,date,time,formatter,ntp,device,display,rtc",
   "description": "Date Time Functions and Classes for ESP8266 and ESP32",
   "homepage": "https://github.com/mcxiaoke/ESPDateTime",
   "authors": {
