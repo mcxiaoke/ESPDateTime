@@ -19,7 +19,7 @@ Or you can install using platformio cli:
  platformio lib install "ESPDateTime"
 ```
 
-And then, add dependency to your `platformio.ini` file:
+Add dependency to your `platformio.ini` file:
 
 ```ini
 lib_deps =
@@ -28,9 +28,9 @@ lib_deps =
      # or Using library Name
      ESPDateTime
      # or Semantic Versioning Rules
-     ESPDateTime@^0.1.0
-     ESPDateTime@~0.1.0
-     ESPDateTime@>=0.1.0
+     ESPDateTime@^0.2.0
+     ESPDateTime@~0.2.0
+     ESPDateTime@>=0.2.0
 ```
 
 ## Using Arduino IDE
