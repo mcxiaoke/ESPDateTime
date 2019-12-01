@@ -9,7 +9,8 @@
 
 static time_t validateTime(const time_t timeSecs) {
   auto bootSecs = timeSecs - (time_t)(millis() / 1000);
-  return bootSecs > SECS_START_POINT ? bootSecs : DateTimeClass::TIME_ZERO;
+  return bootSecs > DateTimeClass::SECS_START_POINT ? bootSecs
+                                                    : DateTimeClass::TIME_ZERO;
 }
 
 String DateTimeParts::format(const char* fmt) const {
@@ -43,7 +44,9 @@ bool DateTimeClass::setTimeZone(int _timeZone) {
   if (_timeZone == timeZone) {
     return false;
   }
-  _DTLOGF("setTimeZone to %d\n", _timeZone);
+#ifdef ESP_DATE_TIME_DEBUG
+  Serial.printf("setTimeZone to %d\n", _timeZone);
+#endif
   if (timeZone >= -11 || timeZone <= 13) {
     timeZone = _timeZone;
     return true;
@@ -54,13 +57,17 @@ void DateTimeClass::setServer(const char* _server) {
   if (strcmp(_server, ntpServer) == 0) {
     return;
   }
-  _DTLOGF("setServer to %s\n", _server);
+#ifdef ESP_DATE_TIME_DEBUG
+  Serial.printf("setServer to %s\n", _server);
+#endif
   ntpServer = _server;
 }
 
 bool DateTimeClass::forceUpdate(const unsigned int timeOutMs) {
-  _DTLOGF("forceUpdate,timeZone:%d, server:%s, timeOut:%u\n", timeZone,
-          ntpServer, timeOutMs);
+#ifdef ESP_DATE_TIME_DEBUG
+  Serial.printf("forceUpdate,timeZone:%d, server:%s, timeOut:%u\n", timeZone,
+                ntpServer, timeOutMs);
+#endif
   // esp8266 not support time_zone, just add seconds
   // so strftime %z always +0000
   configTime(timeZone * 3600, 0, ntpServer, NTP_SERVER_2, NTP_SERVER_3);
@@ -71,7 +78,9 @@ bool DateTimeClass::forceUpdate(const unsigned int timeOutMs) {
     delay(50 + 50 * retryCount++);
     now = time(nullptr);
   }
-  _DTLOGF("forceUpdate,now:%ld\n", now);
+#ifdef ESP_DATE_TIME_DEBUG
+  Serial.printf("forceUpdate,now:%ld\n", now);
+#endif
   ntpMode = true;
   setTime(time(nullptr));
   return isTimeValid();
@@ -81,7 +90,10 @@ bool DateTimeClass::setTime(const time_t timeSecs, bool forceSet) {
   if (forceSet || timeSecs > SECS_START_POINT) {
     bootTimeSecs = timeSecs - (time_t)(millis() / 1000);
   }
-  _DTLOGF("setTime,timeSecs:%ld, bootTimeSecs:%ld\n", timeSecs, bootTimeSecs);
+#ifdef ESP_DATE_TIME_DEBUG
+  Serial.printf("setTime,timeSecs:%ld, bootTimeSecs:%ld\n", timeSecs,
+                bootTimeSecs);
+#endif
   return isTimeValid();
 }
 

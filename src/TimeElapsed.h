@@ -1,7 +1,19 @@
 #ifndef ESP_DATE_TIME_TIME_ELAPSED_H
 #define ESP_DATE_TIME_TIME_ELAPSED_H
 
+/**
+ * @file TimeElapsed.h
+ * @author Zhang Xiaoke (github@mcxiaoke.com)
+ * @brief ESPDateTime header
+ *
+ */
+
 #include <Arduino.h>
+
+/**
+ * @brief TimeElapsed class
+ *
+ */
 
 class TimeElapsed {
  private:
