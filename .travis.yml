@@ -23,4 +23,5 @@ install:
   # - export PLATFORMIO_BUILD_FLAGS="-D GLOBAL_MACROS_FOR_ALL_TEST_ENV"
 
 script:
-  - platformio ci --lib="." --board=nodemcuv2 --board=huzzah --board sparkfunBlynk --board=nodemcu-32s --board=esp32cam --board=esp-wrover-kit --board=esp32thing --board=esp32doit-devkit-v1
+  # - platformio ci --lib="." --board=nodemcuv2 --board=huzzah --board sparkfunBlynk --board=nodemcu-32s --board=esp32cam --board=esp-wrover-kit --board=esp32thing --board=esp32doit-devkit-v1
+  - platformio ci --lib="." --board=nodemcuv2 --board=nodemcu-32s
