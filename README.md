@@ -27,10 +27,8 @@ lib_deps =
      6871
      # or Using library Name
      ESPDateTime
-     # or Semantic Versioning Rules
-     ESPDateTime@^0.2.0
-     ESPDateTime@~0.2.0
-     ESPDateTime@>=0.2.0
+     # or You can use the latest git version
+     https://github.com/mcxiaoke/ESPDateTime.git
 ```
 
 ## Using Arduino IDE
