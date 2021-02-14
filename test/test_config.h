@@ -1,4 +1,3 @@
-//#include <AUnit.h>
 #include <AUnitVerbose.h>
 
 #define ae(arg1, arg2) assertEqual(arg1, arg2)

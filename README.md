@@ -23,10 +23,8 @@ Add dependency to your `platformio.ini` file:
 
 ```ini
 lib_deps =
-     # Using library Id
-     6871
-     # or Using library Name
-     ESPDateTime
+     # Using library Name
+     mcxiaoke/ESPDateTime @ ^0.2.1
      # or You can use the latest git version
      https://github.com/mcxiaoke/ESPDateTime.git
 ```
@@ -108,7 +106,7 @@ See [API Reference](https://blog.mcxiaoke.com/ESPDateTime/).
 
 # License
 
-    Copyright 2019 github@mcxiaoke.com
+    Copyright 2019-2021 github@mcxiaoke.com
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

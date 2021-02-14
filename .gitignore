@@ -18,3 +18,4 @@ config.py
 config.ini
 config.json
 .history
+.pio/

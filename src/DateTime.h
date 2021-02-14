@@ -199,11 +199,6 @@ class DateTimeClass {
    */
   constexpr static int TIMEZONE_UTC = 0;
   /**
-   * @brief TimeZone Offset GMT+8
-   *
-   */
-  constexpr static int TIMEZONE_CHINA = 8;
-  /**
    * @brief Default TimeZone Offset GMT+0
    *
    */
@@ -217,12 +212,12 @@ class DateTimeClass {
    * @brief NTP Server 1
    *
    */
-  constexpr static const char* NTP_SERVER_1 = "ntp.ntsc.ac.cn";
+  constexpr static const char* NTP_SERVER_2 = "time.apple.com";
   /**
    * @brief NTP Server 2
    *
    */
-  constexpr static const char* NTP_SERVER_2 = "pool.ntp.org";
+  constexpr static const char* NTP_SERVER_1 = "pool.ntp.org";
   /**
    * @brief NTP Server 3
    *

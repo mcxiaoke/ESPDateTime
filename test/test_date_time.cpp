@@ -80,10 +80,10 @@ test(T006CustomConstructorB) {
 test(T007NTPDateTime) {
   // 1574956800 = 20191129000000
   DateTime.setTimeZone(8);
-  DateTime.setServer("cn.pool.ntp.org");
+  DateTime.setServer("time.apple.com");
   af(DateTime.isTimeValid());
   ae(8, DateTime.getTimeZone());
-  ae("cn.pool.ntp.org", DateTime.getServer());
+  ae("time.apple.com", DateTime.getServer());
   DateTime.begin();
   Serial.printf("%s (%s, %d)\n", DateTime.toISOString().c_str(), __FUNCTION__,
                 __LINE__);
@@ -111,7 +111,7 @@ test(T008NTPDateTimeClass) {
 }
 
 test(T009DateTimeParts) {
-  // 1574956800 = 20191129000000
+  // 1613277037 = 202102141230
   int z = 8;
   DateTimeClass d;
   d.setTimeZone(8);
@@ -123,10 +123,10 @@ test(T009DateTimeParts) {
   ae(z, p._tz);
   // real time test
   // replace with cur date
-  ae(2019, p.getYear());
-  ae(10, p.getMonth());
-  ae(29, p.getMonthDay());
-  ae(5, p.getWeekDay());
+  ae(2021, p.getYear());
+  ae(2, p.getMonth());
+  ae(14, p.getMonthDay());
+  ae(6, p.getWeekDay());
   //   ae(0, p.getHours());
   //   ae(0, p.getMinutes());
   //   ae(0, p.getSeconds());
