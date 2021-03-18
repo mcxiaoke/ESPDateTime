@@ -12,9 +12,16 @@
 #error "ESPDateTime only support ESP32 or ESP8266 platform!"
 #endif
 
+/**
+ * @brief Default TimeZone Offset GMT+0
+ *
+ */
+#define DEFAULT_TIMEZONE "UTC0"
+
 #include <Arduino.h>
-#include <time.h>
+#include <TZ.h>
 #include <sys/time.h>
+#include <time.h>
 
 class DateTimeClass;
 
@@ -26,9 +33,8 @@ class DateTimeClass;
  */
 struct DateTimeParts {
   // http://www.cplusplus.com/reference/ctime/tm/
-  const time_t _ts;     /**< timestamp variable, internal */
-  const int _tz;        /**< timezone variable, internal */
-  const struct tm* _tm; /**< struct tm variable, internal */
+  const time_t _ts; /**< timestamp variable, internal */
+  const char* _tz;  /**< timezone variable, internal */
   /**
    * @brief Get internal timestamp, in seconds
    *
@@ -40,55 +46,79 @@ struct DateTimeParts {
    *
    * @return int timezone offset
    */
-  int getTimeZone() const { return _tz; }
+  const char* getTimeZone() const { return _tz; }
   /**
    * @brief Get the year (format: 19xx, 20xx)
    *
    * @return int year value
    */
-  int getYear() const { return _tm->tm_year + 1900; }
+  int getYear() const {
+    struct tm* t = localtime(&_ts);
+    return t->tm_year + 1900;
+  }
   /**
    * @brief Get months since January (0-11)
    *
    * @return int month value
    */
-  int getMonth() const { return _tm->tm_mon; }
+  int getMonth() const {
+    struct tm* t = localtime(&_ts);
+    return t->tm_mon;
+  }
   /**
    * @brief Get days since January 1 (0-365)
    *
    * @return int day of year
    */
-  int getYearDay() const { return _tm->tm_yday; }
+  int getYearDay() const {
+    struct tm* t = localtime(&_ts);
+    return t->tm_yday;
+  }
   /**
    * @brief Get day of the month (1-31)
    *
    * @return int month day
    */
-  int getMonthDay() const { return _tm->tm_mday; }
+  int getMonthDay() const {
+    struct tm* t = localtime(&_ts);
+    return t->tm_mday;
+  }
   /**
    * @brief Get days since Sunday (0-6)
    *
    * @return int day of week
    */
-  int getWeekDay() const { return _tm->tm_wday; }
+  int getWeekDay() const {
+    struct tm* t = localtime(&_ts);
+    return t->tm_wday;
+  }
   /**
    * @brief Get hours since midnight (0-23)
    *
    * @return int hours
    */
-  int getHours() const { return _tm->tm_hour; }
+  int getHours() const {
+    struct tm* t = localtime(&_ts);
+    return t->tm_hour;
+  }
   /**
    * @brief Get minutes after the hour (0-59)
    *
    * @return int minutes
    */
-  int getMinutes() const { return _tm->tm_min; }
+  int getMinutes() const {
+    struct tm* t = localtime(&_ts);
+    return t->tm_min;
+  }
   /**
    * @brief Get seconds after the minute (0-60)
    *
    * @return int seconds
    */
-  int getSeconds() const { return _tm->tm_sec; }
+  int getSeconds() const {
+    struct tm* t = localtime(&_ts);
+    return t->tm_sec;
+  }
 
   /**
    * @brief Foramt current time to string representation
@@ -97,6 +127,14 @@ struct DateTimeParts {
    * @return String string representation of current time
    */
   String format(const char* fmt) const;
+
+  /**
+   * @brief Foramt utc time to string representation
+   *
+   * @param fmt format string for strftime
+   * @return String string representation of current time
+   */
+  String formatUTC(const char* fmt) const;
   /**
    * @brief Get string representation of current time
    *
@@ -112,7 +150,8 @@ struct DateTimeParts {
    * @param timeZone  timezone offset (-11,+13)
    * @return DateTimeParts DateTimeParts object
    */
-  static DateTimeParts from(const time_t timeSecs, const int timeZone = 0);
+  static DateTimeParts from(const time_t timeSecs,
+                            const char* timeZone = DEFAULT_TIMEZONE);
   /**
    * @brief factory method for constructing DateTimeParts from DateTimeClass
    * object.
@@ -168,9 +207,8 @@ struct DateFormatter {
    * @param timeZone  timezone offset (-11,13)
    * @return String string representation of timeSecs
    */
-  inline static String format(const char* fmt,
-                              const time_t timeSecs,
-                              const int timeZone = 0) {
+  inline static String format(const char* fmt, const time_t timeSecs,
+                              const char* timeZone = DEFAULT_TIMEZONE) {
     return DateTimeParts::from(timeSecs, timeZone).format(fmt);
   }
 };
@@ -182,27 +220,17 @@ struct DateFormatter {
 class DateTimeClass {
  public:
   /**
-   * @brief Valid min timestamp value 1574870400 (2019/11/28 00:00:00).
+   * @brief Valid min timestamp value 1609459200 (2021/01/01 00:00:00).
    *
-   * return value from time(null) < 1574870400 means system time invalid
+   * return value from time(null) < 1609459200 means system time invalid
    *
    */
-  constexpr static time_t SECS_START_POINT = 1574870400;  // 20191128
+  constexpr static time_t SECS_START_POINT = 1609459200;  // 20191128
   /**
    * @brief Unix Time Zero constant (1970-01-01 00:00:00)
    *
    */
   constexpr static time_t TIME_ZERO = 0;
-  /**
-   * @brief UTC TimeZone Offset GMT+0
-   *
-   */
-  constexpr static int TIMEZONE_UTC = 0;
-  /**
-   * @brief Default TimeZone Offset GMT+0
-   *
-   */
-  constexpr static int DEFAULT_TIMEZONE = TIMEZONE_UTC;  // time zone offset
   /**
    * @brief NTP Request default timeout: 10 seconds
    *
@@ -212,12 +240,12 @@ class DateTimeClass {
    * @brief NTP Server 1
    *
    */
-  constexpr static const char* NTP_SERVER_2 = "time.apple.com";
+  constexpr static const char* NTP_SERVER_1 = "pool.ntp.org";
   /**
    * @brief NTP Server 2
    *
    */
-  constexpr static const char* NTP_SERVER_1 = "pool.ntp.org";
+  constexpr static const char* NTP_SERVER_2 = "time.apple.com";
   /**
    * @brief NTP Server 3
    *
@@ -231,7 +259,7 @@ class DateTimeClass {
    * @param _ntpServer set initialize ntp server
    */
   DateTimeClass(const time_t _timeSecs = TIME_ZERO,
-                const int _timeZone = DEFAULT_TIMEZONE,
+                const char* _timeZone = DEFAULT_TIMEZONE,
                 const char* _ntpServer = NTP_SERVER_1);
   /**
    * @brief Set the TimeZone offset
@@ -240,7 +268,7 @@ class DateTimeClass {
    * @return true if time zone valid and changed
    * @return false if time zone not valid or not changed
    */
-  bool setTimeZone(int _timeZone);
+  bool setTimeZone(const char* _timeZone);
   /**
    * @brief Set the NTP Server
    *
@@ -307,9 +335,7 @@ class DateTimeClass {
    * @return time_t boot timestamp
    */
   inline time_t getBootTime() const {
-    return bootTimeSecs > SECS_START_POINT
-               ? bootTimeSecs
-               : TIME_ZERO - (time_t)(millis() / 1000);
+    return bootTimeSecs > SECS_START_POINT ? bootTimeSecs : TIME_ZERO;
   }
   /**
    * @brief Get current local timestamp, alias of getTime()
@@ -323,25 +349,6 @@ class DateTimeClass {
    * @return time_t timestamp
    */
   inline time_t getTime() const {
-    return bootTimeSecs > SECS_START_POINT
-               ? (bootTimeSecs + (time_t)(millis() / 1000))
-               : TIME_ZERO;
-  }
-  /**
-   * @brief Get current utc timestamp
-   *
-   * @return time_t utc timestamp
-   */
-  inline time_t utcTime() const {
-    return bootTimeSecs > SECS_START_POINT ? (getTime() - timeZone * 3600)
-                                           : TIME_ZERO;
-  }
-  /**
-   * @brief Get system timestamp using time(nullptr), please use now() instead.
-   *
-   * @return time_t timestamp
-   */
-  inline time_t osTime() const {
     auto t = time(nullptr);
     return t > SECS_START_POINT ? t : TIME_ZERO;
   }
@@ -350,7 +357,7 @@ class DateTimeClass {
    *
    * @return int time zone offset
    */
-  inline int getTimeZone() const { return timeZone; }
+  inline const char* getTimeZone() const { return timeZone; }
   /**
    * @brief Get current ntp server address
    *
@@ -399,8 +406,7 @@ class DateTimeClass {
     return *this;
   }
   friend bool operator<(const DateTimeClass& lhs, const DateTimeClass& rhs) {
-    return lhs.bootTimeSecs + lhs.timeZone * 3600 <
-           rhs.bootTimeSecs + rhs.timeZone * 3600;
+    return lhs.bootTimeSecs < rhs.bootTimeSecs;
   }
   friend bool operator>(const DateTimeClass& lhs, const DateTimeClass& rhs) {
     return rhs < lhs;
@@ -429,7 +435,7 @@ class DateTimeClass {
    * @brief Time zone offset
    *
    */
-  int timeZone;
+  const char* timeZone;
   /**
    * @brief First ntp server address.
    *
