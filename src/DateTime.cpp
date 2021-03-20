@@ -71,9 +71,13 @@ bool DateTimeClass::forceUpdate(const unsigned int timeOutMs) {
   Serial.printf("forceUpdate,timeZone:%s, server:%s, timeOut:%u\n", timeZone,
                 ntpServer, timeOutMs);
 #endif
-  // esp8266 not support time_zone, just add seconds
-  // so strftime %z always +0000
+// esp8266 not support time_zone, just add seconds
+// so strftime %z always +0000
+#if defined(ESP8266)
   configTime(timeZone, ntpServer, NTP_SERVER_2, NTP_SERVER_3);
+#elif defined(ESP32)
+  configTzTime(timeZone, ntpServer, NTP_SERVER_2, NTP_SERVER_3);
+#endif
   time_t now = time(nullptr);
   auto startMs = millis();
   unsigned long retryCount = 0;

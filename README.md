@@ -2,7 +2,7 @@
 
 This library provides a simple class `DateTimeClass` for sync system timestamp vis ntp and a struct `DateFormatter` to format date time to string, works on **ESP8266** and **ESP32** platform.
 
-Current Version: **v1.0.1** [![Build Status](https://travis-ci.org/mcxiaoke/ESPDateTime.svg?branch=master)](https://travis-ci.org/mcxiaoke/ESPDateTime)
+Current Version: **v1.0.2** [![Build Status](https://travis-ci.org/mcxiaoke/ESPDateTime.svg?branch=master)](https://travis-ci.org/mcxiaoke/ESPDateTime)
 
 # Install
 
@@ -16,7 +16,7 @@ Or you can install using platformio cli:
 # Using library Id
  platformio lib install 6871
 # or Using library Name
- pio lib install "mcxiaoke/ESPDateTime@^1.0.1"
+ pio lib install "mcxiaoke/ESPDateTime@^1.0.2"
 ```
 
 Add dependency to your `platformio.ini` file:
@@ -24,7 +24,7 @@ Add dependency to your `platformio.ini` file:
 ```ini
 lib_deps =
      # Using library Name
-     mcxiaoke/ESPDateTime @ ^1.0.1
+     mcxiaoke/ESPDateTime @ ^1.0.2
      # or You can use the latest git version
      https://github.com/mcxiaoke/ESPDateTime.git
 ```
@@ -52,7 +52,7 @@ Clone this repo or download source code at [release](https://github.com/mcxiaoke
 
 `DateTime` is a global [`DateTimeClass`](https://github.com/mcxiaoke/ESPDateTime/blob/master/src/DateTime.h#L58) object for use in your code.
 
-You can use `TimeZone` names from here: [TZ.h](https://github.com/esp8266/Arduino/blob/master/cores/esp8266/TZ.h)
+You can pick `TimeZone` name from here: [TZ.h](https://github.com/esp8266/Arduino/blob/master/cores/esp8266/TZ.h) or here: [DateTimeTZ.h](https://github.com/mcxiaoke/ESPDateTime/blob/master/src/DateTimeTZ.h)
 
 ```cpp
 void setupDateTime() {

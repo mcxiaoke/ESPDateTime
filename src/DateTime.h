@@ -19,7 +19,6 @@
 #define DEFAULT_TIMEZONE "UTC0"
 
 #include <Arduino.h>
-#include <TZ.h>
 #include <sys/time.h>
 #include <time.h>
 
