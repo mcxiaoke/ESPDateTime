@@ -13,7 +13,7 @@
     "type": "git",
     "url": "https://github.com/mcxiaoke/ESPDateTime.git"
   },
-  "version": "1.0.2",
+  "version": "1.0.3",
   "license": "Apache-2.0",
   "frameworks": "arduino",
   "platforms": ["espressif8266", "espressif32"]

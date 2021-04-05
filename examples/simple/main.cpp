@@ -11,8 +11,8 @@
 // don't forget to change this to real ssid/password
 // or set these in config.h and include it
 #ifndef WIFI_SSID
-#define WIFI_SSID "Change to your WiFi SSID"
-#define WIFI_PASS "Change to your WiFi Password"
+#error WIFI_SSID "Need define WiFi SSID in config.h"
+#error WIFI_PASS "Need define WiFi Password config.h"
 #endif
 
 unsigned long lastMs = 0;
@@ -23,7 +23,7 @@ void setupWiFi() {
   WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASS);
   Serial.println(millis());
-  Serial.print("WiFi Connecting");
+  Serial.print("WiFi Connecting...");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
@@ -37,11 +37,14 @@ void setupDateTime() {
   // DateTime.setTimeZone(-4);
   //   DateTime.setServer("asia.pool.ntp.org");
   //   DateTime.begin(15 * 1000);
-  DateTime.setServer("ntp.aliyun.com");
+  DateTime.setServer("time.pool.aliyun.com");
   DateTime.setTimeZone("CST-8");
   DateTime.begin();
   if (!DateTime.isTimeValid()) {
     Serial.println("Failed to get time from server.");
+  } else {
+    Serial.printf("Date Now is %s\n", DateTime.toISOString().c_str());
+    Serial.printf("Timestamp is %ld\n", DateTime.now());
   }
 }
 
@@ -54,7 +57,12 @@ void setupDateTime() {
 void showTime() {
   Serial.printf("TimeZone:      %s\n", DateTime.getTimeZone());
   Serial.printf("Up     Time:   %lu seconds\n", millis() / 1000);
+  Serial.printf("Boot   Time:   %ld seconds\n", DateTime.getBootTime());
+  Serial.printf("Cur    Time:   %ld seconds\n",
+                DateTime.getBootTime() + millis() / 1000);
   Serial.printf("Now    Time:   %ld\n", DateTime.now());
+  Serial.printf("OS    Time:   %ld\n", DateTime.osTime());
+  // Serial.println();
   Serial.printf("Local  Time:   %s\n",
                 DateTime.format(DateFormatter::SIMPLE).c_str());
   Serial.printf("ISO86  Time:   %s\n", DateTime.toISOString().c_str());
@@ -93,7 +101,7 @@ void setup() {
 }
 
 void loop() {
-  if (millis() - ms > 30000) {
+  if (millis() - ms > 15 * 1000L) {
     ms = millis();
     Serial.println("--------------------");
     if (!DateTime.isTimeValid()) {

@@ -35,7 +35,7 @@ struct DateTimeParts {
   const time_t _ts; /**< timestamp variable, internal */
   const char* _tz;  /**< timezone variable, internal */
   /**
-   * @brief Get internal timestamp, in seconds
+   * @brief Get current timestamp, in seconds
    *
    * @return time_t timestamp, in seconds
    */
@@ -347,7 +347,13 @@ class DateTimeClass {
    *
    * @return time_t timestamp
    */
-  inline time_t getTime() const {
+  inline time_t getTime() const { return bootTimeSecs + millis() / 1000; }
+  /**
+   * @brief Get os timestamp, in seconds
+   *
+   * @return time_t timestamp, in seconds
+   */
+  inline time_t osTime() const {
     auto t = time(nullptr);
     return t > SECS_START_POINT ? t : TIME_ZERO;
   }

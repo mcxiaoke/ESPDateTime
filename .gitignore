@@ -14,6 +14,7 @@ config.h
 __pycache__
 *.pyc
 .vscode
+private.h
 config.py
 config.ini
 config.json
