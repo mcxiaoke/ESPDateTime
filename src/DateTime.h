@@ -271,9 +271,12 @@ class DateTimeClass {
   /**
    * @brief Set the NTP Server
    *
-   * @param _server ntp server domain name or ip address
+   * @param _server1 ntp server domain name or ip address
+   * @param _server2 ntp server domain name or ip address
+   * @param _server3 ntp server domain name or ip address
    */
-  void setServer(const char* _server);
+  void setServer(const char* _server1, const char* _server2 = NTP_SERVER_2,
+                 const char* _server3 = NTP_SERVER_3);
   /**
    * @brief Force NTP Sync to update system timestamp for internal use, please *
    * using begin() instead.
@@ -283,6 +286,12 @@ class DateTimeClass {
    * @return false if timestamp not valid
    */
   bool forceUpdate(const unsigned int timeOutMs = DEFAULT_TIMEOUT);
+  /**
+   * @brief Force NTP Sync, but not call setTime().
+   *
+   * @param timeOutMs ntp request timeout
+   */
+  time_t ntpTime(const unsigned int timeOutMs = DEFAULT_TIMEOUT);
   /**
    * @brief Set the timestamp from outside, for test only
    *
@@ -347,7 +356,7 @@ class DateTimeClass {
    *
    * @return time_t timestamp
    */
-  inline time_t getTime() const { return bootTimeSecs + millis() / 1000; }
+  inline time_t getTime() const { return osTime(); }
   /**
    * @brief Get os timestamp, in seconds
    *
@@ -355,7 +364,7 @@ class DateTimeClass {
    */
   inline time_t osTime() const {
     auto t = time(nullptr);
-    return t > SECS_START_POINT ? t : TIME_ZERO;
+    return t > SECS_START_POINT ? t : (time_t)(millis() / 1000);
   }
   /**
    * @brief Get current timezone offset
@@ -368,7 +377,7 @@ class DateTimeClass {
    *
    * @return const char* ntp server
    */
-  inline const char* getServer() { return ntpServer; }
+  inline const char* getServer() { return ntpServer1; }
   /**
    * @brief Get DateTimeParts object
    *
@@ -395,11 +404,11 @@ class DateTimeClass {
   inline String toUTCString() { return formatUTC(DateFormatter::HTTP); }
   // operator overloads
   DateTimeClass operator+(const time_t timeDeltaSecs) {
-    DateTimeClass dt(getTime() + timeDeltaSecs, timeZone, ntpServer);
+    DateTimeClass dt(getTime() + timeDeltaSecs, timeZone, ntpServer1);
     return dt;
   }
   DateTimeClass operator-(const time_t timeDeltaSecs) {
-    DateTimeClass dt(getTime() - timeDeltaSecs, timeZone, ntpServer);
+    DateTimeClass dt(getTime() - timeDeltaSecs, timeZone, ntpServer1);
     return dt;
   }
   DateTimeClass& operator-=(const time_t timeDeltaSecs) {
@@ -445,7 +454,9 @@ class DateTimeClass {
    * @brief First ntp server address.
    *
    */
-  const char* ntpServer;
+  const char* ntpServer1 = NTP_SERVER_1;
+  const char* ntpServer2 = NTP_SERVER_2;
+  const char* ntpServer3 = NTP_SERVER_3;
   bool ntpMode;
 };
 

@@ -26,7 +26,7 @@ void setupWiFi() {
   Serial.print("WiFi Connecting...");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Serial.print(".");
+    Serial.print(WiFi.status());
   }
   Serial.println();
 }
@@ -61,7 +61,8 @@ void showTime() {
   Serial.printf("Cur    Time:   %ld seconds\n",
                 DateTime.getBootTime() + millis() / 1000);
   Serial.printf("Now    Time:   %ld\n", DateTime.now());
-  Serial.printf("OS    Time:   %ld\n", DateTime.osTime());
+  Serial.printf("OS     Time:   %ld\n", DateTime.osTime());
+  Serial.printf("NTP    Time:   %ld\n", DateTime.ntpTime(2 * 1000L));
   // Serial.println();
   Serial.printf("Local  Time:   %s\n",
                 DateTime.format(DateFormatter::SIMPLE).c_str());
